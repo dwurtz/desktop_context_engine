@@ -33,6 +33,7 @@ from rich.text import Text
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
 GOALS_FILE = os.path.join(DATA_DIR, "goals.json")
 GOALS_MD = os.path.join(DATA_DIR, "goals.md")
 DESKTOP_MEMORY_MD = os.path.join(DATA_DIR, "desktop_memory.md")
