@@ -72,7 +72,9 @@ async def call_tool(name, arguments):
         return [TextContent(type="text", text=content)]
 
     if name == "set_goal":
-        goal_name = arguments["name"]
+        goal_name = arguments["name"].strip()
+        if not goal_name:
+            return [TextContent(type="text", text="Goal name cannot be empty")]
         description = arguments["description"]
         icon = arguments.get("icon", "\U0001f3af")
         people = arguments.get("people", "- (none specified)")

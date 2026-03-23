@@ -7,7 +7,7 @@ when confidence is high.
 
 Usage:
     source venv/bin/activate
-    ANTHROPIC_API_KEY=... python3 monitor.py
+    ANTHROPIC_API_KEY=... python3 monitor_terminal.py
 """
 
 import hashlib
@@ -19,11 +19,10 @@ import sys
 import textwrap
 import threading
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 from anthropic import Anthropic
 from rich.console import Console, Group
-from rich.layout import Layout
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
@@ -34,7 +33,6 @@ from rich.text import Text
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
-GOALS_FILE = os.path.join(DATA_DIR, "goals.json")
 GOALS_MD = os.path.join(DATA_DIR, "goals.md")
 DESKTOP_MEMORY_MD = os.path.join(DATA_DIR, "desktop_memory.md")
 PREDICTED_ACTIONS_MD = os.path.join(DATA_DIR, "predicted_actions.md")
@@ -45,7 +43,6 @@ AMBIENT_DB = os.path.join(BASE_DIR, "internal", "ambient.db")
 SIGNAL_INTERVAL = 2        # seconds between signal collection
 ANALYSIS_INTERVAL = 15     # seconds between LLM analysis
 SCREEN_INTERVAL = 10       # seconds between screenshot analysis
-HIGH_CONFIDENCE_THRESHOLD = 2  # signals needed to trigger research + recommendation
 ANALYSIS_MODEL = "claude-haiku-4-5-20251001"
 
 GOAL_COLORS = ["bright_cyan", "bright_green", "bright_yellow", "bright_magenta",
@@ -77,22 +74,16 @@ seen_clipboard_hash: str = ""
 # Rolling log lines for display (newest first, capped at 200)
 log_lines: list = []
 
-# Notified goals (don't re-notify for same batch)
-notified_goals: set = set()
-
 # Browser & app state (for display panels)
 current_tabs: list = []       # [{title, url}, ...]
 current_app: str = ""         # frontmost app name
 current_window_title: str = ""  # frontmost window title
-active_tab_title: str = ""    # Chrome's active tab title
 last_tab_event: str = ""      # most recent tab change
 last_app_event: str = ""      # most recent app switch
 running_apps: list = []       # foreground apps
 
 # Screen analysis state
 last_screen_summary: str = "" # latest vision description
-last_screenshot_path: str = ""
-
 # Anthropic client — initialised in main()
 client: Anthropic = None
 
@@ -603,11 +594,7 @@ def build_analysis_prompt(pending_signals: list[dict]) -> str:
         with open(GOALS_MD) as f:
             goals_text = f.read()
     except Exception:
-        # Fallback to goals.json
-        goals_text = "\n".join(
-            f"  - {g['name']}: {g['description']}"
-            for g in goals_config.get("goals", [])
-        )
+        goals_text = ""
 
     # People are already included in goals.md under each goal's "Key People" section.
     # No need for a separate people list.
@@ -920,7 +907,7 @@ def calendar_loop():
 
 def screen_loop(pending: list, pending_lock: threading.Lock):
     """Capture and analyze screenshots — only triggered by app/tab/window changes."""
-    global last_screen_summary, last_screenshot_path
+    global last_screen_summary
     last_hash = ""
     while True:
         # Block until something changes (app switch, tab switch, window title change)
