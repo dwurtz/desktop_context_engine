@@ -208,15 +208,15 @@ def configure_claude_desktop(venv_python):
 
     mcp_servers["desktop-memory"] = {
         "command": python_path,
-        "args": [str(PROJECT_DIR / "mcp_memory.py")],
+        "args": [str(PROJECT_DIR / "mcps" / "desktop_memory.py")],
     }
-    mcp_servers["desktop-goals"] = {
+    mcp_servers["goals"] = {
         "command": python_path,
-        "args": [str(PROJECT_DIR / "mcp_goals.py")],
+        "args": [str(PROJECT_DIR / "mcps" / "goals.py")],
     }
-    mcp_servers["desktop-messaging"] = {
+    mcp_servers["predict-next-action"] = {
         "command": python_path,
-        "args": [str(PROJECT_DIR / "mcp_messaging.py")],
+        "args": [str(PROJECT_DIR / "mcps" / "predict_next_action.py")],
     }
 
     config["mcpServers"] = mcp_servers
@@ -226,8 +226,8 @@ def configure_claude_desktop(venv_python):
 
     print_step("Added 3 MCP servers to Claude Desktop config:")
     print_info("  • desktop-memory")
-    print_info("  • desktop-goals")
-    print_info("  • desktop-messaging")
+    print_info("  • goals")
+    print_info("  • predict-next-action")
     print()
     if console:
         console.print("  [bold yellow]→ Restart Claude Desktop to load the new tools[/bold yellow]")
