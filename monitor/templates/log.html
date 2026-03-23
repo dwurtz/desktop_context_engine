@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Context Monitor — Log</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a18;
+            color: #e8e4de;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+            font-size: 13px;
+            padding: 16px;
+        }
+        h1 {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #c4a882;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333330;
+        }
+        .stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #8a8780;
+        }
+        .stats span { color: #c4a882; }
+        .log-entry {
+            padding: 6px 8px;
+            border-bottom: 1px solid #2a2a28;
+            line-height: 1.4;
+        }
+        .log-entry:hover { background: #222220; }
+        .source {
+            display: inline-block;
+            min-width: 80px;
+            color: #7a9ec2;
+            font-weight: 500;
+        }
+        .source.imessage { color: #5cb85c; }
+        .source.whatsapp { color: #25d366; }
+        .source.chrome { color: #e8a838; }
+        .source.clipboard { color: #b48ead; }
+        .source.screen { color: #d08770; }
+        .source.active_app { color: #8a8780; }
+        .source.match { color: #c4a882; font-weight: 700; }
+        .timestamp {
+            color: #5a5a58;
+            font-size: 11px;
+            margin-right: 8px;
+        }
+        .sender { color: #88c0d0; }
+        .text { color: #e8e4de; }
+        .empty {
+            color: #5a5a58;
+            text-align: center;
+            padding: 40px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Desktop Context Monitor</h1>
+    <div class="stats">
+        Signals: <span id="signal-count">0</span>
+        &nbsp;|&nbsp;
+        Goals matched: <span id="match-count">0</span>
+        &nbsp;|&nbsp;
+        Status: <span id="status">Loading...</span>
+    </div>
+    <div id="log"></div>
+
+    <script>
+        async function refresh() {
+            try {
+                const resp = await fetch('/api/log');
+                const data = await resp.json();
+
+                document.getElementById('signal-count').textContent = data.signal_count || 0;
+                document.getElementById('match-count').textContent = data.match_count || 0;
+                document.getElementById('status').textContent = data.status || 'Unknown';
+
+                const log = document.getElementById('log');
+                const entries = data.entries || [];
+
+                if (entries.length === 0) {
+                    log.innerHTML = '<div class="empty">No signals collected yet. Monitoring...</div>';
+                    return;
+                }
+
+                log.innerHTML = entries.map(e => `
+                    <div class="log-entry">
+                        <span class="timestamp">${e.dt || ''}</span>
+                        <span class="source ${e.source || ''}">[${e.source || '?'}]</span>
+                        ${e.sender ? `<span class="sender">${e.sender}</span>: ` : ''}
+                        <span class="text">${escapeHtml(e.text || '')}</span>
+                    </div>
+                `).join('');
+            } catch (err) {
+                document.getElementById('status').textContent = 'Connection error';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        refresh();
+        setInterval(refresh, 2000);
+    </script>
+</body>
+</html>
