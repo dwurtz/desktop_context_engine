@@ -118,7 +118,15 @@ python3 monitor_terminal.py --fresh
 
 The `--fresh` flag pre-scans existing signals on startup so only new activity triggers analysis. The terminal displays a Rich dashboard showing all four phases (OBSERVING, THINKING, RECORDING, PREDICTING) with live signal counts and goal match status.
 
-Then open Claude Desktop and say: **"What should I be focused on right now?"**
+## Tip: Reliable Tool Usage in Claude Desktop
+
+To ensure Claude consistently uses the desktop context tools, create a **Project** in Claude Desktop (e.g., "Life") and add this to the project instructions:
+
+> Use the goals, predicted action and desktop context tools.
+
+Then in the project's settings, set **Tool access mode** to **"Tools already loaded"**. This ensures the MCP tools are always available in the conversation context, so Claude will use them without needing to discover them first.
+
+Then open Claude Desktop in that project and say: **"What should I be focused on right now?"**
 
 ## The Three Files
 
