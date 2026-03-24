@@ -126,7 +126,21 @@ To ensure Claude consistently uses the desktop context tools, create a **Project
 
 Then in the project's settings, set **Tool access mode** to **"Tools already loaded"**. This ensures the MCP tools are always available in the conversation context, so Claude will use them without needing to discover them first.
 
-Then open Claude Desktop in that project and say: **"What should I be focused on right now?"**
+Then open Claude Desktop in that project and try some of the prompts below.
+
+## Things to Try
+
+Once the monitor is running and Claude Desktop is configured, try asking:
+
+- **"How am I doing on my goals?"** -- Claude checks your goals, desktop memory, and predicted actions to give you a status update.
+- **"What should I focus on right now?"** -- Surfaces the highest-priority action based on what the monitor has observed.
+- **"What's the latest on [goal name]?"** -- Gets a focused update on a specific goal with recent signals and next steps.
+- **"Did I miss anything important today?"** -- Reviews the desktop memory log for signals you may not have acted on.
+- **"Draft a message to [person] about [goal]."** -- Claude knows who's involved and what context to include from the memory log.
+- **"Check my calendar for conflicts with [goal]."** -- Combines desktop context with Google Calendar to spot scheduling issues.
+- **"Add a new goal: [description]"** -- Creates a new goal via the `set_goal` MCP tool. The monitor will start matching signals to it immediately.
+
+The more context the monitor has collected, the better Claude's answers will be. Let it run for a while as you go about your day.
 
 ## The Three Files
 
